@@ -1,4 +1,4 @@
-# Recipes-and-Ratings-Project
+# Recipes and Ratings Project
 Name: Yagnasri Chilukuri
 
 ## Overview
