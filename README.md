@@ -1,4 +1,4 @@
-# Recipes and Ratings Project
+# Analyzing Dietary Trends and High-Carbohydrate Recipes Within Recipes and Ratings Data
 Name: Yagnasri Chilukuri
 
 ## Overview
