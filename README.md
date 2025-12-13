@@ -169,6 +169,15 @@ Below, I create a pivot table to show how the number of calories per recipe diff
 |   2017 | 605.058 | 717.538 |
 |   2018 | 828.096 | 995.568 |
 
+I would also like to see if recipe complexity (based on the number of steps or the number of ingredients) affects nutritional content. If there are a higher number of ingredients or steps, there may be a chance for higher PDV of carbohydrates, sugar, or fat. Below, I plot the average nutritional content of recipes depending on the number of ingredients. In this plot, I excluded extreme outliers that were present within the `'pdv_carb'`, `'pdv_sugar'`, and `'pdv_fat'` columns as they made the original plot hard to interpret.
+
+<iframe
+  src="assets/nutr_and_ing.html"
+  width="800"
+  height="600"
+  frameborder="0"
+></iframe>
+
 ## Assessment of Missingness
 After checking each column, the results were that the `'name'`, `'description'`, `'user_id'`, `'recipe_id'`, `'date'`, `'rating'`, `'review'`, and `'average_rating'` columns had NaN values. Using this information, I then decided which columns needed to be cleaned. 
 
