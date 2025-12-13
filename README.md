@@ -34,3 +34,54 @@ The chart below describes each column within the `recipes` dataset once more.
 | `description`      | User-provided description                                                                                                                                                                         |
 | `ingredients`      | Text for recipe ingredients                                                                                                                                                                       |
 | `n_ingredients`    | Number of ingredients in recipe                                                                                                                                                                   |
+
+#### Information about the `ratings` dataset
+Below are the first few rows of the `ratings` dataset which consists of **731927** rows and the following columns: `'user_id'` - the user ID of whoever submitted the rating and / or review, `'recipe_id'` - the ID of the recipe, `'date'` - the date the rating and / or review was submitted, `'rating'` the rating on on a scale of 1-5, and `'review'` - the review text.
+
+|    user_id |   recipe_id | date       |   rating |
+|-----------:|------------:|:-----------|---------:|
+|    1293707 |       40893 | 2011-12-21 |        5 |
+|     126440 |       85009 | 2010-02-27 |        5 |
+|      57222 |       85009 | 2011-10-01 |        5 |
+|     124416 |      120345 | 2011-08-06 |        0 |
+| 2000192946 |      120345 | 2015-05-10 |        2 |
+
+The chart below describes each column within the `ratings` dataset once more.
+
+| Column        | Description         |
+| :------------ | :------------------ |
+| `'user_id'`   | User ID             |
+| `'recipe_id'` | Recipe ID           |
+| `'date'`      | Date of interaction |
+| `'rating'`    | Rating given        |
+| `'review'`    | Review text         |
+
+#### Question Identification
+The main question I am interested in answering about this dataset is if there exists a *preference for certain diets* based on the amount of recipes that were published with certain nutritional values during certain years. I am interested in this because I find fashion, dietary, and lifestyle trends very interesting as they are often cyclical. I want to know if there was a time that certain diets (such as low-carb diets) were most prevalent. A related problem would to see if carbohydrate-dense recipes are rated highly in comparison to recipes that consist of less carbohydrates. I am interested in answering this question because, at least in Western media, carbohydrates are often demonized and regarded as "unhealthy". People often opt to cut out nutrients such as carbohydrates and sugar. It may also be the case that "healthy" (carbohydrate- or sugar-lacking) meals taste worse than carbohydrate- or sugar-dense meals.
+
+## Data Cleaning and Exploratory Data Analysis
+
+#### Merging `recipes` and `ratings`
+For the rest of my analysis, I will be using the `recipes_and_ratings` dataset, which is a merged dataset of `recipes` and `ratings`. First, I left merged the `recipes` and `ratings` datasets. Then, I filled all ratings of 0 with NaN values, since the corresponding recipes *do not have any ratings, not intentional ratings of 0*. Then, I added another column to the `recipes_and_ratings` dataset, `'average_rating'`, which is the average rating of each recipe.
+
+The `recipes_and_ratings` dataset consists of all of the same columns that were mentioned earlier, plus one more column: `'average_rating'` - the average rating of the recipe.
+
+| Column             | Description |
+| :----------------- | :---------- |
+| `'name'`           | object      |
+| `'id'`             | int64       |
+| `'minutes'`        | int64       |
+| `'contributor_id'` | int64       |
+| `'submitted'`      | object      |
+| `'tags'`           | object      |
+| `'nutrition'`      | object      |
+| `'n_steps'`        | int64       |
+| `'steps'`          | object      |
+| `'description'`    | object      |
+| `'ingredients'`    | object      |
+| `'n_ingredients'`  | int64       |
+| `'user_id'`        | float64     |
+| `'recipe_id'`      | float64     |
+| `'date'`           | object      |
+| `'rating'`         | float64     |
+| `'review'`         | object      |
