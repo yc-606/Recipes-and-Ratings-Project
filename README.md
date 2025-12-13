@@ -62,26 +62,114 @@ The main question I am interested in answering about this dataset is if there ex
 ## Data Cleaning and Exploratory Data Analysis
 
 #### Merging `recipes` and `ratings`
-For the rest of my analysis, I will be using the `recipes_and_ratings` dataset, which is a merged dataset of `recipes` and `ratings`. First, I left merged the `recipes` and `ratings` datasets. Then, I filled all ratings of 0 with NaN values, since the corresponding recipes *do not have any ratings, not intentional ratings of 0*. Then, I added another column to the `recipes_and_ratings` dataset, `'average_rating'`, which is the average rating of each recipe.
+For the rest of my analysis, I will be using the `recipes_and_ratings` dataset, which is a merged dataset of `recipes` and `ratings`. First, I left merged the `recipes` and `ratings` datasets. Then, I filled all ratings of 0 with NaN values, since the corresponding recipes *do not have any ratings, not intentional ratings of 0*. Finally, I added another column to the `recipes_and_ratings` dataset, `'average_rating'`, which is the average rating of each recipe.
 
-The `recipes_and_ratings` dataset consists of all of the same columns that were mentioned earlier, plus one more column: `'average_rating'` - the average rating of the recipe.
+I then made sure that the datatypes of certain columns in `recipes_and_ratings` were the datatypes I wanted before moving forward.
 
-| Column             | Description |
-| :----------------- | :---------- |
-| `'name'`           | object      |
-| `'id'`             | int64       |
-| `'minutes'`        | int64       |
-| `'contributor_id'` | int64       |
-| `'submitted'`      | object      |
-| `'tags'`           | object      |
-| `'nutrition'`      | object      |
-| `'n_steps'`        | int64       |
-| `'steps'`          | object      |
-| `'description'`    | object      |
-| `'ingredients'`    | object      |
-| `'n_ingredients'`  | int64       |
-| `'user_id'`        | float64     |
-| `'recipe_id'`      | float64     |
-| `'date'`           | object      |
-| `'rating'`         | float64     |
-| `'review'`         | object      |
+Within recipes_and_ratings, all of the date-related columns needed to be TimeStamp objects, so I converted the `'submitted'` and `'date'` columns to TimeStamp objects. The `'submitted'` column proved to be useful throughout this project because I was able to easily extract the year component from the transformed column.
+
+I also converted the `'tags'` and `'ingredients'` columns to actual lists of strings. Previously, the "lists" were actually strings themselves. Similarly, I converted the `'nutrition'` column to actual lists of floats. The `'nutrition'` column was one of the most useful columns within the dataset after it was transformed such that I could access the percent daily value (PDV) information of each nutrient. All of these resulting columns are shown below.
+
+The final `recipes_and_ratings` dataset consists of all of the same columns that were mentioned earlier, plus one more column: `'average_rating'` - the average rating of the recipe.
+
+Below are all of the columns in the new dataset, `recipes_and_ratings` and their datatype descriptions.
+
+| Column                  | Description    |
+| :---------------------- | :------------- |
+| `'name'`                | object         |
+| `'id'`                  | int64          |
+| `'minutes'`             | int64          |
+| `'contributor_id'`      | int64          |
+| `'submitted'`           | datetime64[ns] |
+| `'tags'`                | object         |
+| `'nutrition'`           | object         |
+| `'n_steps'`             | int64          |
+| `'steps'`               | object         |
+| `'description'`         | object         |
+| `'ingredients'`         | object         |
+| `'n_ingredients'`       | int64          |
+| `'user_id'`             | float64        |
+| `'recipe_id'`           | float64        |
+| `'date'`                | datetime64[ns] |
+| `'rating'`              | float64        |
+| `'review'`              | object         |
+| `'average_rating'`      | object         |
+| `'n_cals'`              | float64        |
+| `'pdv_fat'`             | float64        |
+| `'pdv_sugar'`           | float64        |
+| `'pdv_sodium'`          | float64        |
+| `'pdv_protein'`         | float64        |
+| `'pdv_sat_fat'`         | float64        |
+| `'pdv_carb'`            | float64        |
+
+Below are the first few unique rows of the new `recipes_and_ratings` dataset. Some of the columns are ommitted for the sake of readability. This dataset ended up with 234429 rows and 27 columns.
+
+INSERT
+
+#### Univariate analysis
+To start exploratory data analysis on this dataset, I started by analyzing the `'pdv_carb'` column to see what range of percent daily value of carbohydrates were the most common. Displayed below, this graph follows a right-skew trend, illustrating how there tends to be less recipes with a higher PDV of carbohydrates. Visually, we can see that the mean PDV of carbohydrates is around 10-15%.
+
+In this plot, I chose to cap the `'pdv_carb'` column because there were some outliers that had extremely high `'pdv_carb'` values. For simplicity, I grouped all of the values that were above the 99th percentile of the `'pdv_carb'` column into one group (that is positioned around 200 visually on the graph).
+
+INSERT
+
+Another feature that was interesting to graph was the `'n_ingredients'` column. Recipes with less ingredients may be considered healthier, as recipes with more simplicity might be less for enjoyment and more for dietary reasons, which is something I could have used later on within this project. The graph of the distribution of recipes (count) given the number of ingredients needed for each recipe is shown below. We can see that the distribution is slightly skewed to the right, but a general bell-curve trend is followed. The mean number of ingredients is around 9.
+
+INSERT
+
+#### Bivariate analysis
+In regard to bivariate analysis, I wanted to illustrate the relationship between rating and number of ingredients, which I do below. I first calculated the average rating of recipes with *n* number of ingredients by grouping by `'n_ingredients'`, then graphed the relationship between the average rating and `'n_ingredients'`. This visualization is interesting because there seems to be a potentially quadratic relationship between average rating of recipes with *n* number of ingredients. Higher average ratings seem to come from recipes with more ingredients, which may be a result of these recipes tasting better due to the inclusion of more diverse ingredients.
+
+INSERT
+
+Finally, I wanted to see if there existed a relationship between recipes that had certain tags and their ratings. To do this, I added an additional column to the `recipes_and_ratings` dataset, titled `'has_dietary_tags'`. The values of this column were boolean values of either True or False and indicated whether or not the respective recipe had a tag within its `'tags'` list that I was interested in. After analyzing all of the unique tags that appeared within the dataset and their relevance to dietary choices (such as low-carb diets), I chose the following tags to be representative of a True value in the `'has_dietary_tags'` column: 'dietary', 'low-sodium', 'low-in-something', 'diabetic', 'free-of-something', 'low-protein', 'very-low-carbs', 'low-cholesterol', 'low-saturated-fat', 'low-calorie', 'low-carb', 'healthy-2', 'healthy', 'low-fat', and 'high-in-something-diabetic-friendly'. This means that if a recipe had at least one of the aforementioned tags within its tag list, it had a True value within the `'has_dietary_tags'` column. By observing the graph below, it seems that there exists a decrease in recipes with at least on dietary tag over time (the opposing relationship is also true). The bars representing the percentage of recipes per year that have at least one dietary tag (pink) are above 60% until 2012, where this percentage decreases significantly moving forward. Similarly, the bars representing the percentage of recipes per year that do not have any dietary tags (teal) are below 40% until 2012, where this percentage increases significantly moving forward.
+
+INSERT
+
+#### Interesting aggregates
+Below, I create a pivot table to show how the number of calories per recipe differ between years separately for recipes that have and do not have dietary tags. Within this pivot table, I observed that the mean number of calories for recipes that do not have dietary tags were greater than the number of calories for recipes that have dietary tags up until 2016. From 2016 onward, the opposite relationship is true. I found this to be interesting because we know from earlier that the usage of dietary tags had increased as time went on, but according to this pivot table, the more common usage of dietary tags in recent years does not mean that recent recipes have a lower calorie count on average.
+
+INSERT
+
+## Assessment of Missingness
+After checking each column, the results were that the `'name'`, `'description'`, `'user_id'`, `'recipe_id'`, `'date'`, `'rating'`, `'review'`, and `'average_rating'` columns had NaN values. Using this information, I then decided which columns needed to be cleaned. 
+
+The `'description'` column had NaN values because it was optional for recipe authors to include a description of their recipe. The `'user_id'`, `'recipe_id'`, and `'date'` columns can have NaN values because a recipe can have 0 reviews or ratings, meaning all of the columns from the previous `rating` dataset will appear as NaN for these rows. The `'rating'` column has NaN values because I replaced all ratings of 0 with np.nan. I also know that `'review'` can be NaN because a person can rate a recipe and not provide a review. Finally, the `'average_rating'` column can have NaN values because a recipe has no ratings.
+
+Out of these columns, I wanted to investigate the missingness of the `'name'`, `'description'`, `'rating'`, and `'review'` columns.
+
+For the `'name'` column, I found that after copy-and-pasting the recipe's ID (stored within the `'id'` column) into food.com, the recipe was actually a salad dressing recipe with the title "-------------". Because these characters were stripped when the data was scraped, the name of the recipe was listed as a NaN value. Although the `'name'` column is not important, I filled this NaN value with a simple name, 'salad dressing'. I concluded that the reason why there was a singular NaN value within the `'name'` column was due to the original name itself. This means that the missingness of the `'name'` column is NMAR (Not Missing At Random), because the name itself (multiple dashes) caused itself to appear as NaN within the final cleaned dataset. This is because the developers of this dataset chose to omit unecessary characters such as dashes, resulting in this title appearing as a NaN value due to it consisting of only dashes.
+
+Regarding the `'review'` column, it is most likely that the missingness is NMAR (Not Missing At Random) as well, meaning the missingness depends on the review itself. This may be the case because a person might only review a recipe if it is either extremely bad or extremely good by their standards. If a recipe tastes like an ordinary meal to the user, they might be less likely to write a review because they do not have anything impactful to state about the recipe.
+
+Next, we can test the dependency of the `'rating'` column on another column, which may demonstrate a relationship between the missingness of `'rating'` and the values of another column. This would indicate a missingness classification of MAR (Missing At Random) in regard to the `'rating'` column. Below, I test if the `'rating'` column is dependent on the PDV of carbs (`'pdv_carb'`).
+
+##### Null Hypothesis:
+The missingness of the `'rating'` column does not depend on the `'pdv_carb'` column; the distribution of `'pdv_carb'` values is the same for recipes with missing ratings and recipes with non-missing ratings.
+##### Alternative Hypothesis:
+The missingness of the `'rating'` column does depend on the `'pdv_carb'` column; the distribution of `'pdv_carb'` values is not the same for recipes with missing ratings and recipes with non-missing ratings.
+##### Test Statistic:
+The absolute difference between the means of the PDV of carbohydrates for missing vs. non-missing ratings.
+
+INSERT
+
+In the above graph, I chose not to graph the observed test statistic, as it is extremely far to the right of the graph at an x-value of approximately 2.5. Due to this fact, our p-value came out to be 0.0. Selecting a standard alpha value of 0.05, our p-value, 0.0, is less than this. This means that we may reject the null hypothesis. This means that the missingness of the `'rating'` column did depend on the `'pdv_carb'` column; the '`rating'` column is MAR (Missing At Random) dependent on the `'pdv_carb'` column.
+
+Once again, we can test the dependency of the `'rating'` column on another column. This time, I chose to test the dependency of the `'rating'` column on the `'minutes'` column. Below, I follow the same steps as I did in the previous permutation test to test whether or not the missingness of the `'rating'` column is dependent on the `'minutes'` column.
+
+##### Null Hypothesis:
+The missingness of the `'rating'` column does not depend on the `'minutes'` column; the distribution of `'minutes'` values is the same for recipes with missing ratings and recipes with non-missing ratings.
+##### Alternative Hypothesis:
+The missingness of the `'rating'` column does depend on the `'minutes'` column; the distribution of `'minutes'` values is not the same for recipes with missing ratings and recipes with non-missing ratings.
+##### Test Statistic:
+The absolute difference between the means of the PDV of carbohydrates for missing vs. non-missing ratings.
+
+## Hypothesis Testing
+
+## Framing a Prediction Problem
+
+## Baseline Model
+
+## Final Model
+
+## Fairness Analysis
