@@ -178,6 +178,8 @@ I would also like to see if recipe complexity (based on the number of steps or t
   frameborder="0"
 ></iframe>
 
+Looking at the graph above, it seems that there is a slight yet steady increase in the average `'pdv_carb'` and `'pdv_fat'` average values as the number of ingredients increases. The average PDV of sugar creates a few spikes in the graph at points where there are a greater number of ingredients. This may suggest that an increase in the number of ingredients increases the nutritional content of recipes.
+
 ## Assessment of Missingness
 After checking each column, the results were that the `'name'`, `'description'`, `'user_id'`, `'recipe_id'`, `'date'`, `'rating'`, `'review'`, and `'average_rating'` columns had NaN values. Using this information, I then decided which columns needed to be cleaned. 
 
