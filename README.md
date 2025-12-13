@@ -104,7 +104,13 @@ Below are all of the columns in the new dataset, `recipes_and_ratings` and their
 
 Below are the first few unique rows of the new `recipes_and_ratings` dataset. Some of the columns are ommitted for the sake of readability. This dataset ended up with 234429 rows and 27 columns.
 
-INSERT
+| name                                 |     id |   minutes |   contributor_id | submitted           |   n_steps |   n_ingredients |          user_id |   recipe_id | date                |   rating |   average_rating |   n_cals |   pdv_fat |   pdv_sugar |   pdv_sodium |   pdv_protein |   pdv_sat_fat |   pdv_carb |   pdv_carb_capped |
+|:-------------------------------------|-------:|----------:|-----------------:|:--------------------|----------:|----------------:|-----------------:|------------:|:--------------------|---------:|-----------------:|---------:|----------:|------------:|-------------:|--------------:|--------------:|-----------:|------------------:|
+| 1 brownies in the world    best ever | 333281 |        40 |           985201 | 2008-10-27 00:00:00 |        10 |               9 | 386585           |      333281 | 2008-11-19 00:00:00 |        4 |                4 |    138.4 |        10 |          50 |            3 |             3 |            19 |          6 |                 6 |
+| 1 in canada chocolate chip cookies   | 453467 |        45 |          1848091 | 2011-04-11 00:00:00 |        12 |              11 | 424680           |      453467 | 2012-01-26 00:00:00 |        5 |                5 |    595.1 |        46 |         211 |           22 |            13 |            51 |         26 |                26 |
+| 412 broccoli casserole               | 306168 |        40 |            50969 | 2008-05-30 00:00:00 |         6 |               9 |  29782           |      306168 | 2008-12-31 00:00:00 |        5 |                5 |    194.8 |        20 |           6 |           32 |            22 |            36 |          3 |                 3 |
+| 412 broccoli casserole               | 306168 |        40 |            50969 | 2008-05-30 00:00:00 |         6 |               9 |      1.19628e+06 |      306168 | 2009-04-13 00:00:00 |        5 |                5 |    194.8 |        20 |           6 |           32 |            22 |            36 |          3 |                 3 |
+| 412 broccoli casserole               | 306168 |        40 |            50969 | 2008-05-30 00:00:00 |         6 |               9 | 768828           |      306168 | 2013-08-02 00:00:00 |        5 |                5 |    194.8 |        20 |           6 |           32 |            22 |            36 |          3 |                 3 |
 
 #### Univariate analysis
 To start exploratory data analysis on this dataset, I started by analyzing the `'pdv_carb'` column to see what range of percent daily value of carbohydrates were the most common. Displayed below, this graph follows a right-skew trend, illustrating how there tends to be less recipes with a higher PDV of carbohydrates. Visually, we can see that the mean PDV of carbohydrates is around 10-15%.
@@ -129,7 +135,19 @@ INSERT
 #### Interesting aggregates
 Below, I create a pivot table to show how the number of calories per recipe differ between years separately for recipes that have and do not have dietary tags. Within this pivot table, I observed that the mean number of calories for recipes that do not have dietary tags were greater than the number of calories for recipes that have dietary tags up until 2016. From 2016 onward, the opposite relationship is true. I found this to be interesting because we know from earlier that the usage of dietary tags had increased as time went on, but according to this pivot table, the more common usage of dietary tags in recent years does not mean that recent recipes have a lower calorie count on average.
 
-INSERT
+|   year |   False |    True |
+|-------:|--------:|--------:|
+|   2008 | 439.206 | 402.916 |
+|   2009 | 442.588 | 389.943 |
+|   2010 | 441.878 | 390.224 |
+|   2011 | 467.016 | 414.848 |
+|   2012 | 465.909 | 406.742 |
+|   2013 | 501.196 | 422.233 |
+|   2014 | 458.903 | 433.178 |
+|   2015 | 607.392 | 392.998 |
+|   2016 | 490.408 | 655.034 |
+|   2017 | 605.058 | 717.538 |
+|   2018 | 828.096 | 995.568 |
 
 ## Assessment of Missingness
 After checking each column, the results were that the `'name'`, `'description'`, `'user_id'`, `'recipe_id'`, `'date'`, `'rating'`, `'review'`, and `'average_rating'` columns had NaN values. Using this information, I then decided which columns needed to be cleaned. 
