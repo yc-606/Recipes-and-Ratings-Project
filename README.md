@@ -162,14 +162,67 @@ The missingness of the `'rating'` column does not depend on the `'minutes'` colu
 ##### Alternative Hypothesis:
 The missingness of the `'rating'` column does depend on the `'minutes'` column; the distribution of `'minutes'` values is not the same for recipes with missing ratings and recipes with non-missing ratings.
 ##### Test Statistic:
-The absolute difference between the means of the PDV of carbohydrates for missing vs. non-missing ratings.
+The absolute difference between the means of the mean number of minutes for missing vs. non-missing ratings.
+
+INSERT
+
+In the graph above, I plotted the observed test statistic, which is approximately 51. Using an alpha value of 0.05, we fail to reject the null hypothesis as our p-value of 0.13 is greater than 0.05. This permutation test indicates that the missingness of the `'rating'` column is not dependent on the `'minutes'` column.
 
 ## Hypothesis Testing
+For this section, I was interested in answering the following question: Is the average `'pdv_carb'` value for recipes that have dietary tags different from the `'pdv_carb'` value for recipes that do not have dietary tags?
+
+The pair of hypotheses I was interested in testing within this section are the following:
+
+##### Null Hypothesis:
+The distribution of `'pdv_carb'` values is the same for recipes that have dietary tags and recipes that do not have dietary tags.
+##### Alternative Hypothesis:
+The distribution of `'pdv_carb'` values is not the same for recipes that have dietary tags and recipes that do not have dietary tags.
+##### Test Statistic:
+The absolute difference between the means of the PDV of carbohydrates for recipes with dietary tags and recipes without dietary tags.
+
+Below, I run a permutation test where I shuffle the `'has_dietary_tags'` column (which consists of Trues and Falses, as we saw earlier). Using an alpha value of 0.05, we fail to reject the null hypothesis. The average `'pdv_carb'` value of recipes that have a dietary tag and recipes that do not have a dietary tag seem to come from the same distribution, meaning that there is most likely no relationship between the PDV of carbohydrates of a recipe and whether or not a recipe has a dietary related tag.
+
+INSERT
 
 ## Framing a Prediction Problem
+In the following section, I would like to predict the average *rounded* rating of a recipe given its PDV of carbohydrates and whether or not it has a dietary-related tag. I chose `'rating'` to be my response variable because I am interested in investigating whether or not "health" indicators such as tags and carbohydrate content truly impacts the average rating of a recipe.
+
+This is a multi-class classification problem because the response variable `'rating'` has five possible values: 1, 2, 3, 4, or 5. The evaluation metric I will be using is F1-score because the number of recipes that are rated highly is much greater than the number of recipes that are not (see below). Using F1-score balances precision and recall; we do not want to use accuracy because the majority of the recipes within the `recipes_and_ratings` dataset are rated highly.
+
+The issue with using accuracy can be explained in the following example: if we have a dataset with 80% of its recipes rated very highly (5) , 10% of its recipes rated highly (4), and 10% of its recipes rated low (1, 2, or 3), we can technically build a classifier that always predicts that a recipe will be rated 5 stars. Using just accuracy, this means that our model will be right 80% of the time, masking the true failure of our model.
 
 ## Baseline Model
+The two features that I will be using to train my model are `'pdv_carb'` and `'has_dietary_tags'`. `'pdv_carb'` is a quantitative column that contains the percent daily value of carbohydrates for a recipe, so it is ratio data. I used a QuantileTransformer() on this feature (and other features that will be addressed in the next section) because, as seen earlier during the univariate analysis section, there exist large outliers and a skew in the distribution of `'pdv_carb'` values in the `recipes_and_ratings` dataset. Additionally, I will need to one-hot-encode the `'has_dietary_tags'` column since it is a categorical feature (nominal data) with two possible values: True and False. This feature was engineered from the `'tags'` column, which was done in a previous step. I also drop one of the one-hot-encoded columns, as seen below. We must drop one of the columns that results from one-hot-encoding to prevent multicollinearity or redundancy within our features.
+
+The stratify parameter is set to y to prevent the test set from ending up with too few low-rated recipes. Stratifying ensures that all classes are represented proportionally.
+
+The F1-Score of the baseline model came out to be approximately 0.63. However, the F1-score for each individual rating was as follows: {1: 0.00, 2: 0.00, 3: 0.01, 4: 0.01, 5: 0.85}. Additionally, there were many warnings that were presented when I ran the code for my model. While looking at the aforementioned results, I can deduced that the baseline model was not very effective in predicting rating. My baseline model never predicted low-rated recipes at all (hence the many warnings), only predicting a rating of 3, 4 or 5. The F1-score for a rating of 5 is high because this class dominates the dataset (there is a large number of recipes that are rated 5 stars on average). This might have occurred because this model has very limited features. In the next step, I add many more features that will improve the F1-score of my model.
 
 ## Final Model
+For my final model, I chose to add the features `'year'`, `'n_ingredients'`, `'pdv_sugar'`, and `'pdv_fat'`. I chose to add `'year'` as a feature because I noticed that `'year'` demonstrated a relationship with the proportion of recipes that were tagged with a dietary-relevant tag during my exploratory data analysis section. `'year'` is treated as a categorical variable, as there are only 10 years represented within this dataset. The year represents discrete time periods rather than some continuous quantity. By one-hot-encoding the `'year'` column, my model will be able to "learn" effects that depend on individual years.
+
+I chose to add `'n_ingredients'` as a feature because during my exploratory data analysis, I noticed a clear trend between the number of ingredients and average recipe rating. This trend seemed to be somewhat quadratic, indicating a potential relationship between average recipe rating and the number of ingredients.
+
+Finally, I added `'pdv_sugar'` and `'pdv_fat'` for the same reason I wanted to use `'pdv_fat'` to predict rating: I wanted to see if the average rating of recipes did infact influence average rating for a recipe, since these nutrients are often considered to be harmful in large quantities yet very addicting.
+
+I used a RandomForestClassifier for the model and used GridSearchCV to tune the following hyperparameters: max_depth and n_estimators. It is crucial to tune max_depth because decision trees are very likely to overfit to the data it is trained on if its max_depth is not limited. On the other hand, if max_depth is too constrained, the decision tree is likely to underfit to the data it is trained on. This is why it is important to tune this hyperparameter to guarantee the best generalizability of our model. n_estimators essentially represents how many trees you "ask" for a prediction. We do not want n_estimators to be too small because the model might rely on a small amount of bad predictions, which is why we want to tune this hyperparameter to a value that lets the model average out mistakes, thus making more reliable predictions.
+
+The F1-score of my final model was approximately 0.92, with the F1-scores for each individual rating as follows: {1: 0.32, 2: 0.61, 3: 0.63, 4: 0.85, 5: 0.95}. As we can see from the weighted F1-score and the individual F1-scores of each rating, this model predicts rating much better than the baseline model. The F1-score of the final model is approximately 0.92, which is a 0.29 increase from the F1-Score of the baseline model. Additionally, we can see that the F1-score of a rating of 1, 2, and 3 are no longer 0. The baseline model had individual F1-scores of approximately 0.0, 0.0, 0.1, 0.1, and 0.85, while the improved model has individual F1-scores of approximately 0.32, 0.61, 0.63, 0.85, and 0.95. Although we still see the trend where the model is much worse as correctly identifying low-rated recipes, the increases in individual F1-scores are still significant, demonstrating the improvement between my baseline model and final model. The best combination of hyperparameters was: max_depth = None and n_estimators = 200.
 
 ## Fairness Analysis
+For this section, I was curious to see if my final model would perform worse when predicting the average rating of recipes that do not have any dietary tags in comparison to recipes that do have at least one dietary tag.
+
+##### Group X:
+Recipes with at least one dietary-related tag (the value within the `'has_dietary_tags'` column will be True).
+##### Group Y:
+Recipes without any dietary-related tags (the value within the `'has_dietary_tags'` column will be False).
+##### Null Hypothesis:
+The model performs equally well for recipes in Group X and recipes in Group Y.
+##### Alternative Hypothesis:
+The model performs worse for either Group X or Group Y.
+##### Test Statistic:
+The signed difference between the F1-score for Group X and the F1-score for Group Y (a negative sign indicates that the model performed worse for recipes with a dietary tag while a positive sign indicates that the model performed worse for recipes without a dietary tag).
+
+INSERT
+
+By looking at the distribution, we can see that our observed test statistic was not one that would appear within the distribution. Using an alpha value of 0.05 and our p-value of approximately 0.0, we get that 0.0 < 0.05, meaning that our final model is not fair in its performance across Group X and Group Y. In other words, the F1-score is significantly different between the two groups, meaning that the model performs significantly better for Group X than for Group Y. This is because our observed test statistic is positive, suggesting that Group X's F1-score was greater than Group Y's F1-score, which is not due to chance as demonstrated by the graph above.
