@@ -117,20 +117,40 @@ To start exploratory data analysis on this dataset, I started by analyzing the `
 
 In this plot, I chose to cap the `'pdv_carb'` column because there were some outliers that had extremely high `'pdv_carb'` values. For simplicity, I grouped all of the values that were above the 99th percentile of the `'pdv_carb'` column into one group (that is positioned around 200 visually on the graph).
 
-INSERT
+<iframe
+  src="assets/pdv_carb_dist.html"
+  width="800"
+  height="600"
+  frameborder="0"
+></iframe>
 
 Another feature that was interesting to graph was the `'n_ingredients'` column. Recipes with less ingredients may be considered healthier, as recipes with more simplicity might be less for enjoyment and more for dietary reasons, which is something I could have used later on within this project. The graph of the distribution of recipes (count) given the number of ingredients needed for each recipe is shown below. We can see that the distribution is slightly skewed to the right, but a general bell-curve trend is followed. The mean number of ingredients is around 9.
 
-INSERT
+<iframe
+  src="assets/n_ing_dist.html"
+  width="800"
+  height="600"
+  frameborder="0"
+></iframe>
 
 #### Bivariate analysis
 In regard to bivariate analysis, I wanted to illustrate the relationship between rating and number of ingredients, which I do below. I first calculated the average rating of recipes with *n* number of ingredients by grouping by `'n_ingredients'`, then graphed the relationship between the average rating and `'n_ingredients'`. This visualization is interesting because there seems to be a potentially quadratic relationship between average rating of recipes with *n* number of ingredients. Higher average ratings seem to come from recipes with more ingredients, which may be a result of these recipes tasting better due to the inclusion of more diverse ingredients.
 
-INSERT
+<iframe
+  src="assets/rating_vs_n_ing.html"
+  width="800"
+  height="600"
+  frameborder="0"
+></iframe>
 
 Finally, I wanted to see if there existed a relationship between recipes that had certain tags and their ratings. To do this, I added an additional column to the `recipes_and_ratings` dataset, titled `'has_dietary_tags'`. The values of this column were boolean values of either True or False and indicated whether or not the respective recipe had a tag within its `'tags'` list that I was interested in. After analyzing all of the unique tags that appeared within the dataset and their relevance to dietary choices (such as low-carb diets), I chose the following tags to be representative of a True value in the `'has_dietary_tags'` column: 'dietary', 'low-sodium', 'low-in-something', 'diabetic', 'free-of-something', 'low-protein', 'very-low-carbs', 'low-cholesterol', 'low-saturated-fat', 'low-calorie', 'low-carb', 'healthy-2', 'healthy', 'low-fat', and 'high-in-something-diabetic-friendly'. This means that if a recipe had at least one of the aforementioned tags within its tag list, it had a True value within the `'has_dietary_tags'` column. By observing the graph below, it seems that there exists a decrease in recipes with at least on dietary tag over time (the opposing relationship is also true). The bars representing the percentage of recipes per year that have at least one dietary tag (pink) are above 60% until 2012, where this percentage decreases significantly moving forward. Similarly, the bars representing the percentage of recipes per year that do not have any dietary tags (teal) are below 40% until 2012, where this percentage increases significantly moving forward.
 
-INSERT
+<iframe
+  src="assets/year_and_tag.html"
+  width="800"
+  height="600"
+  frameborder="0"
+></iframe>
 
 #### Interesting aggregates
 Below, I create a pivot table to show how the number of calories per recipe differ between years separately for recipes that have and do not have dietary tags. Within this pivot table, I observed that the mean number of calories for recipes that do not have dietary tags were greater than the number of calories for recipes that have dietary tags up until 2016. From 2016 onward, the opposite relationship is true. I found this to be interesting because we know from earlier that the usage of dietary tags had increased as time went on, but according to this pivot table, the more common usage of dietary tags in recent years does not mean that recent recipes have a lower calorie count on average.
@@ -169,7 +189,12 @@ The missingness of the `'rating'` column does depend on the `'pdv_carb'` column;
 ##### Test Statistic:
 The absolute difference between the means of the PDV of carbohydrates for missing vs. non-missing ratings.
 
-INSERT
+<iframe
+  src="assets/first_missingness.html"
+  width="800"
+  height="600"
+  frameborder="0"
+></iframe>
 
 In the above graph, I chose not to graph the observed test statistic, as it is extremely far to the right of the graph at an x-value of approximately 2.5. Due to this fact, our p-value came out to be 0.0. Selecting a standard alpha value of 0.05, our p-value, 0.0, is less than this. This means that we may reject the null hypothesis. This means that the missingness of the `'rating'` column did depend on the `'pdv_carb'` column; the '`rating'` column is MAR (Missing At Random) dependent on the `'pdv_carb'` column.
 
@@ -182,7 +207,12 @@ The missingness of the `'rating'` column does depend on the `'minutes'` column; 
 ##### Test Statistic:
 The absolute difference between the means of the mean number of minutes for missing vs. non-missing ratings.
 
-INSERT
+<iframe
+  src="assets/second_missingness.html"
+  width="800"
+  height="600"
+  frameborder="0"
+></iframe>
 
 In the graph above, I plotted the observed test statistic, which is approximately 51. Using an alpha value of 0.05, we fail to reject the null hypothesis as our p-value of 0.13 is greater than 0.05. This permutation test indicates that the missingness of the `'rating'` column is not dependent on the `'minutes'` column.
 
@@ -200,7 +230,12 @@ The absolute difference between the means of the PDV of carbohydrates for recipe
 
 Below, I run a permutation test where I shuffle the `'has_dietary_tags'` column (which consists of Trues and Falses, as we saw earlier). Using an alpha value of 0.05, we fail to reject the null hypothesis. The average `'pdv_carb'` value of recipes that have a dietary tag and recipes that do not have a dietary tag seem to come from the same distribution, meaning that there is most likely no relationship between the PDV of carbohydrates of a recipe and whether or not a recipe has a dietary related tag.
 
-INSERT
+<iframe
+  src="assets/hypothesis_test.html"
+  width="800"
+  height="600"
+  frameborder="0"
+></iframe>
 
 ## Framing a Prediction Problem
 In the following section, I would like to predict the average *rounded* rating of a recipe given its PDV of carbohydrates and whether or not it has a dietary-related tag. I chose `'rating'` to be my response variable because I am interested in investigating whether or not "health" indicators such as tags and carbohydrate content truly impacts the average rating of a recipe.
@@ -241,6 +276,11 @@ The model performs worse for either Group X or Group Y.
 ##### Test Statistic:
 The signed difference between the F1-score for Group X and the F1-score for Group Y (a negative sign indicates that the model performed worse for recipes with a dietary tag while a positive sign indicates that the model performed worse for recipes without a dietary tag).
 
-INSERT
+<iframe
+  src="assets/fairness.html"
+  width="800"
+  height="600"
+  frameborder="0"
+></iframe>
 
 By looking at the distribution, we can see that our observed test statistic was not one that would appear within the distribution. Using an alpha value of 0.05 and our p-value of approximately 0.0, we get that 0.0 < 0.05, meaning that our final model is not fair in its performance across Group X and Group Y. In other words, the F1-score is significantly different between the two groups, meaning that the model performs significantly better for Group X than for Group Y. This is because our observed test statistic is positive, suggesting that Group X's F1-score was greater than Group Y's F1-score, which is not due to chance as demonstrated by the graph above.
